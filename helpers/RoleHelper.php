@@ -1,0 +1,111 @@
+<?php
+
+namespace app\helpers;
+
+use app\models\Player;
+
+class RoleHelper
+{
+    /**
+     * Assign roles to the game model
+     * @param  Game $gameModel
+     * @return array
+     */
+    public static function assign($gameModel)
+    {
+        $players = [];
+        $playerModel = Player::find()->where(['fk_game_id' => $gameModel->id])->all();
+        $players = array_map(function($value) {
+            return $value->name;
+        }, $playerModel);
+
+        // randomize player order
+        shuffle($players);
+
+        // assign the minions
+        $minions = [];
+        $numberOfPlayers = sizeof($players);
+        $numberOfMinions = $gameModel->minionRules[$numberOfPlayers];
+        for($i = 0; $i < $numberOfMinions; $i++) {
+            $minions[] = array_pop($players);
+        }
+
+        // assign the servants (remaining players are servants)
+        $servants = $players;
+
+        // do a check to make sure special characters don't outnumber the minion
+        $specialMinionCount = 0;
+        if ($gameModel->mordred == '1') $specialMinionCount++;
+        if ($gameModel->morgana == '1') $specialMinionCount++;
+        if ($gameModel->mordred == '1') $specialMinionCount++;
+        if ($specialMinionCount > $numberOfMinions) {
+            throw new \Exception('Number of special characters out number minion count!');
+        }
+
+        // assign assassin
+        $assignedPlayers[] = [
+            'name' => array_pop($minions),
+            'team' => 'minions',
+            'role' => 'assassin'
+        ];
+
+        if ($gameModel->mordred == '1') {
+            $assignedPlayers[] = [
+                'name' => array_pop($minions),
+                'team' => 'minions',
+                'role' => 'mordred'
+            ];
+        }
+
+        if ($gameModel->morgana == '1') {
+            $assignedPlayers[] = [
+                'name' => array_pop($minions),
+                'team' => 'minions',
+                'role' => 'morgana'
+            ];
+        }
+
+        if ($gameModel->mordred == '1') {
+            $assignedPlayers[] = [
+                'name' => array_pop($minions),
+                'team' => 'minions',
+                'role' => 'oberon'
+            ];
+        }
+
+        // assign remaining minions
+        for ($i = 0; $i < sizeof($minions); $i++) {
+            $assignedPlayers[] = [
+                'name' => $minions[$i],
+                'team' => 'minions',
+                'role' => 'minion'
+            ];
+        }
+
+        // assign merlin
+        $assignedPlayers[] = [
+            'name' => array_pop($servants),
+            'team' => 'servants',
+            'role' => 'merlin'
+        ];
+
+        if ($gameModel->percival == '1') {
+            $assignedPlayers[] = [
+                'name' => array_pop($servants),
+                'team' => 'servants',
+                'role' => 'percival'
+            ];
+        }
+
+        // assign remaining servants
+        for ($i = 0; $i < sizeof($servants); $i++) {
+            $assignedPlayers[] = [
+                'name' => $servants[$i],
+                'team' => 'servants',
+                'role' => 'servant'
+            ];
+        }
+
+        return $assignedPlayers;
+    }
+}

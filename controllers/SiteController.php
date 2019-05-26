@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use Yii;
 use app\models\Game;
+use app\models\Player;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -63,19 +64,47 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        $model = new Game();
+        $playerModel = new Player();
+        $gameModel = Game::find()->where(['started' => '0'])->orderBy('id DESC')->one();
+        $playerCount = (int)$gameModel->getPlayerCount();
+        $gameAvailable = $this->checkAvailableGame($gameModel, $playerCount);
 
-        $dataProvider = new ActiveDataProvider([
-            'query' => Game::find(),
-        ]);
+        if ($playerModel->load(Yii::$app->request->post())) {
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index', 'id' => $model->id]);
+            // check if max number of players reached
+            if ($playerCount + 1 >= $gameModel->players) {
+                return $this->redirect(['index']);
+            }
+
+            // redirect if player saves
+            if ($playerModel->save()) {
+                return $this->redirect(['wait', 'id' => $playerModel->id]);
+            }
         }
 
         return $this->render('index', [
+            'gameModel' => $gameModel,
+            'playerModel' => $playerModel,
+            'playerCount' => $playerCount,
+            'gameAvailable' => $gameAvailable,
+        ]);
+    }
+
+    /**
+     * Waiting page
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionWait($id)
+    {
+        $model = $this->findPlayerModel($id);
+        if (Yii::$app->request->post()) {
+            // redirect to role page
+        }
+
+        return $this->render('wait', [
             'model' => $model,
-            'dataProvider' => $dataProvider,
         ]);
     }
 
@@ -111,5 +140,39 @@ class SiteController extends Controller
         Yii::$app->user->logout();
 
         return $this->goHome();
+    }
+
+    /**
+     * Finds the Player model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return Player the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findPlayerModel($id)
+    {
+        if (($model = Player::findOne($id)) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    /**
+     * Check if game is available
+     * @param  Game $gameModel
+     * @param  int $playerCount
+     * @return boolean
+     */
+    protected function checkAvailableGame($gameModel, $playerCount) {
+        if ($gameModel === null) {
+            return false;
+        }
+
+        if ($playerCount >= $gameModel->players) {
+            return false;
+        }
+
+        return true;
     }
 }
