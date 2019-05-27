@@ -111,15 +111,16 @@ class SiteController extends Controller
         $model = $this->findPlayerModel($id);
         $gameModel = Game::find()->where(['id'=>$model->fk_game_id])->one();
 
-        if (Yii::$app->request->post() && $gameModel->isReady()) {
-            if ($gameModel->isReady() == false) {
+        if (Yii::$app->request->post()) {
+            if ($gameModel->isReady() === false) {
                 $model->addError('name', 'Game is not yet ready!');
+            } else {
+                // save player id into session (so user cannot enter role id in URL in the role page)
+                Yii::$app->session['playerId'] = $model->id;
+                return $this->redirect(['role', 'id' => $model->fk_game_id]);
             }
 
-            // save player id into session (so user cannot enter role id in URL in the role page)
-            Yii::$app->session['playerId'] = $model->id;
 
-            return $this->redirect(['role', 'id' => $model->fk_game_id]);
         }
 
         return $this->render('@app/views/common/wait.php', [

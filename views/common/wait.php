@@ -15,10 +15,17 @@ $this->title = 'Wait Page';
 
     <?php $form = ActiveForm::begin(); ?>
     <?= $form->errorSummary($model); ?>
-    <p>When all other players have joined, click here:</p>
-    <div class="form-group">
-        <?= Html::submitButton('Start Game', ['class' => 'btn btn-success']) ?>
-    </div>
+    <?php if (Yii::$app->user->isGuest): ?>
+        <p>Click here when Admin has started the game:</p>
+        <div class="form-group">
+            <?= Html::submitButton('Join Game', ['class' => 'btn btn-success']) ?>
+        </div>
+    <?php else: ?>
+        <p>When all other players have joined, click here:</p>
+        <div class="form-group">
+            <?= Html::submitButton('Start Game', ['class' => 'btn btn-success']) ?>
+        </div>
+    <?php endif ?>
     <?php ActiveForm::end(); ?>
 
 </div>

@@ -30,14 +30,11 @@ Player
             `can't see shit
 
 misc:
-    upload
-    edit database file
-
+    `don't allow user to enter player id into URL
     `check for duplicate player name for the game
     `home link for admin shouldn't go to player page
     `Player shouldn't be able to start game until Admin starts it
     `Morgana can only be used when Percival is in the game
     `use session to keep player id when going from wait page to role page
-        don't display name in role page
     `move assign roles to another class
     `bug: user can join even though there's more
