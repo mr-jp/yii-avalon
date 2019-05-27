@@ -115,7 +115,11 @@ class SiteController extends Controller
             if ($gameModel->isReady() == false) {
                 $model->addError('name', 'Game is not yet ready!');
             }
-            return $this->redirect(['role', 'id' => $model->fk_game_id, 'playerId' => $model->id]);
+
+            // save player id into session (so user cannot enter role id in URL in the role page)
+            Yii::$app->session['playerId'] = $model->id;
+
+            return $this->redirect(['role', 'id' => $model->fk_game_id]);
         }
 
         return $this->render('@app/views/common/wait.php', [
@@ -129,8 +133,13 @@ class SiteController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionRole($id, $playerId)
+    public function actionRole($id)
     {
+        if (isset($_GET['playerId'])) {
+            throw new NotFoundHttpException('Nice try!');
+        }
+
+        $playerId = Yii::$app->session['playerId'];
         $gameModel = $this->findGameModel($id);
         $playerModel = $this->findPlayerModel($playerId);
         extract(RoleHelper::findRoles($gameModel));
