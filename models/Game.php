@@ -6,6 +6,7 @@ use Yii;
 use app\models\Player;
 use app\helpers\RoleHelper;
 use app\helpers\MyHelper;
+use yii\web\NotFoundHttpException;
 
 /**
  * This is the model class for table "game".
@@ -167,7 +168,9 @@ class Game extends \yii\db\ActiveRecord
             $player = Player::find()->where(['name'=>$role['name'], 'fk_game_id'=>$this->id])->one();
             $player->team = $role['team'];
             $player->role = $role['role'];
-            $player->save();
+            if ($player->save() == false) {
+                throw new NotFoundHttpException('Cannot save player role ...');
+            }
         }
     }
 }

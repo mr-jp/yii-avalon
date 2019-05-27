@@ -33,7 +33,7 @@ class Player extends \yii\db\ActiveRecord
             [['fk_game_id'], 'integer'],
             [['name'], 'string', 'max' => 100],
             [['team', 'role'], 'string', 'max' => 50],
-            ['name', 'checkDuplicateName']
+            ['name', 'checkDuplicateName', 'on' => 'create']    // only check this on 'create' scenario
         ];
     }
 

@@ -6,7 +6,7 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model app\models\Game */
 
-$this->title = $model->id;
+$this->title = 'Wait Page';
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="wait-view">

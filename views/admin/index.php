@@ -4,7 +4,7 @@ use yii\widgets\ActiveForm;
 use yii\grid\GridView;
 /* @var $this yii\web\View */
 
-$this->title = 'Avalon Roles';
+$this->title = 'Avalon Role Generator';
 ?>
 <div class="site-index">
 

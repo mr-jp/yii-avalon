@@ -30,6 +30,9 @@ Player
             `can't see shit
 
 misc:
+    upload
+    edit database file
+
     `check for duplicate player name for the game
     `home link for admin shouldn't go to player page
     `Player shouldn't be able to start game until Admin starts it

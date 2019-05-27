@@ -27,11 +27,11 @@ class AdminController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['index', 'wait', 'role', 'delete'],
+                'only' => ['index', 'view', 'wait', 'role', 'delete'],
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'wait', 'role', 'delete'],
+                        'actions' => ['index', 'view', 'wait', 'role', 'delete'],
                         'roles' => ['@'],
                     ],
                 ],
