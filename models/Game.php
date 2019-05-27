@@ -5,6 +5,7 @@ namespace app\models;
 use Yii;
 use app\models\Player;
 use app\helpers\RoleHelper;
+use app\helpers\MyHelper;
 
 /**
  * This is the model class for table "game".
@@ -49,6 +50,7 @@ class Game extends \yii\db\ActiveRecord
             [['players'], 'integer'],
             [['timestamp'], 'string', 'max' => 50],
             ['players', 'checkRules'],
+            ['players', 'checkMorgana'],
         ];
     }
 
@@ -87,6 +89,26 @@ class Game extends \yii\db\ActiveRecord
     }
 
     /**
+     * Special rule for Morgana
+     * {@inheritdoc}
+     */
+    public function checkMorgana($attribute, $params)
+    {
+        if ($this->morgana == '1' && $this->percival == '0') {
+            $this->addError('players', 'Percival needs to be enabled for Morgana to come into play!');
+        }
+    }
+
+    /**
+     * Check if the game has started or not
+     * @return boolean
+     */
+    public function isReady()
+    {
+        return $this->started == '1';
+    }
+
+    /**
      * Start the game!
      * @return [type] [description]
      */
@@ -95,6 +117,8 @@ class Game extends \yii\db\ActiveRecord
         // do a rule check
         if($this->validate() && $this->checkNumberOfPlayers()) {
             $this->assignRoles();
+            $this->started = '1';
+            $this->save();
             return true;
         }
 
@@ -138,7 +162,12 @@ class Game extends \yii\db\ActiveRecord
     {
         $roles = RoleHelper::assign($this);
 
-        // @todo save roles to database
-        ArrayHelper::fPrint($roles);exit;
+        // save role and team in database for everyone
+        foreach($roles as $role) {
+            $player = Player::find()->where(['name'=>$role['name'], 'fk_game_id'=>$this->id])->one();
+            $player->team = $role['team'];
+            $player->role = $role['role'];
+            $player->save();
+        }
     }
 }

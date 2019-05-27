@@ -9,9 +9,11 @@ use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
+use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\helpers\RoleHelper;
 
 class SiteController extends Controller
 {
@@ -66,13 +68,21 @@ class SiteController extends Controller
     {
         $playerModel = new Player();
         $gameModel = Game::find()->where(['started' => '0'])->orderBy('id DESC')->one();
+
+        // don't display anything if no game at the moment
+        if ($gameModel === null) {
+            return $this->render('index', [
+                'gameAvailable' => false,
+            ]);
+        }
+
         $playerCount = (int)$gameModel->getPlayerCount();
         $gameAvailable = $this->checkAvailableGame($gameModel, $playerCount);
 
         if ($playerModel->load(Yii::$app->request->post())) {
 
             // check if max number of players reached
-            if ($playerCount + 1 >= $gameModel->players) {
+            if ($playerCount >= $gameModel->players) {
                 return $this->redirect(['index']);
             }
 
@@ -99,12 +109,39 @@ class SiteController extends Controller
     public function actionWait($id)
     {
         $model = $this->findPlayerModel($id);
-        if (Yii::$app->request->post()) {
-            // redirect to role page
+        $gameModel = Game::find()->where(['id'=>$model->fk_game_id])->one();
+
+        if (Yii::$app->request->post() && $gameModel->isReady()) {
+            if ($gameModel->isReady() == false) {
+                $model->addError('name', 'Game is not yet ready!');
+            }
+            return $this->redirect(['role', 'id' => $model->fk_game_id, 'playerId' => $model->id]);
         }
 
-        return $this->render('wait', [
+        return $this->render('@app/views/common/wait.php', [
             'model' => $model,
+        ]);
+    }
+
+    /**
+     * Role page
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionRole($id, $playerId)
+    {
+        $gameModel = $this->findGameModel($id);
+        $playerModel = $this->findPlayerModel($playerId);
+        extract(RoleHelper::findRoles($gameModel));
+
+        return $this->render('@app/views/common/role.php', [
+            'gameModel' => $gameModel,
+            'playerModel' => $playerModel,
+            'minions' => $minions,
+            'servants' => $servants,
+            'merlin' => $merlin,
+            'morgana' => $morgana,
         ]);
     }
 
@@ -140,6 +177,22 @@ class SiteController extends Controller
         Yii::$app->user->logout();
 
         return $this->goHome();
+    }
+
+    /**
+     * Finds the Game model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return Game the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findGameModel($id)
+    {
+        if (($model = Game::findOne($id)) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
     }
 
     /**

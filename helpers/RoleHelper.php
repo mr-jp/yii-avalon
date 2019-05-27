@@ -65,7 +65,7 @@ class RoleHelper
             ];
         }
 
-        if ($gameModel->mordred == '1') {
+        if ($gameModel->oberon == '1') {
             $assignedPlayers[] = [
                 'name' => array_pop($minions),
                 'team' => 'minions',
@@ -107,5 +107,22 @@ class RoleHelper
         }
 
         return $assignedPlayers;
+    }
+
+    /**
+     * Return roles for a game
+     * @param  Game $gameModel
+     * @return array
+     */
+    public static function findRoles($gameModel)
+    {
+        $minions = Player::find()->where(['fk_game_id'=>$gameModel->id, 'team'=>'minions'])->all();
+        $servants = Player::find()->where(['fk_game_id'=>$gameModel->id, 'team'=>'servants'])->all();
+        $merlin = Player::find()->where(['fk_game_id'=>$gameModel->id, 'role'=>'merlin'])->one();
+        $percival = Player::find()->where(['fk_game_id'=>$gameModel->id, 'role'=>'percival'])->one();
+        $mordred = Player::find()->where(['fk_game_id'=>$gameModel->id, 'role'=>'mordred'])->one();
+        $morgana = Player::find()->where(['fk_game_id'=>$gameModel->id, 'role'=>'morgana'])->one();
+        $oberon = Player::find()->where(['fk_game_id'=>$gameModel->id, 'role'=>'oberon'])->one();
+        return compact('minions', 'servants', 'merlin', 'percival', 'mordred', 'morgana', 'oberon');
     }
 }

@@ -33,6 +33,7 @@ class Player extends \yii\db\ActiveRecord
             [['fk_game_id'], 'integer'],
             [['name'], 'string', 'max' => 100],
             [['team', 'role'], 'string', 'max' => 50],
+            ['name', 'checkDuplicateName']
         ];
     }
 
@@ -48,5 +49,22 @@ class Player extends \yii\db\ActiveRecord
             'role' => 'Role',
             'fk_game_id' => 'Fk Game ID',
         ];
+    }
+
+    public function checkDuplicateName($attribute, $params)
+    {
+        $count = Player::find()->where(['name'=>$this->name])->count();
+        if ($count > 0) {
+            $this->addError('name', "{$this->name} is already in the game!");
+        }
+    }
+
+    /**
+     * Delete all players from this game
+     * @param  int $gameId
+     */
+    public static function deleteFromGame($gameId)
+    {
+        Player::deleteAll('fk_game_id = :gameId', ['gameId'=>$gameId]);
     }
 }

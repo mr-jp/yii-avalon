@@ -29,8 +29,8 @@ AppAsset::register($this);
 <div class="wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => 'Avalon Roles',
-        'brandUrl' => Yii::$app->homeUrl,
+        'brandLabel' => $this->title,
+        'brandUrl' => Yii::$app->user->isGuest ? Yii::$app->homeUrl : Yii::$app->urlManager->createUrl("admin/index"),
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
         ],

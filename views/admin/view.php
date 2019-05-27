@@ -12,9 +12,11 @@ $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="game-view">
-
-    <h2><?= date("Ydm - H:i", $model->timestamp) ?></h2>
-
-    <h3>Players</h3>
-
+    <h1><?= date("Ydm - H:i", $model->timestamp) ?></h1>
+    <h2>Players</h2>
+    <ol>
+        <?php foreach ($players as $player): ?>
+            <li><?= ucfirst($player->name) ?> - <?= ucfirst($player->role) ?></li>
+        <?php endforeach ?>
+    </ol>
 </div>

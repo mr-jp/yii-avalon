@@ -1,14 +1,13 @@
 Admin
     `List Games
         `View Game
-            Player List
+            `Player List
     `Create New Game
         `Waiting Page
             `Check number of players
             `Add Admin to player list
-            Start Game
-                list all players (and roles for testing)
-        Role Page
+            `Start Game
+        `Role Page
 Player
     `Game is closed ...
         `if no open game
@@ -19,21 +18,22 @@ Player
     Wait page
         button when everyone is ready
     Role Pages
-        Merlin
-            sees all bad guys except Mordred
-        Percival
-            sees Merlin and Morgana
-        Resistance
-            sees themself
-        Spies
-            sees themself except Oberon
-        Oberon
-            can't see shit
+        `Merlin
+            `sees all bad guys except Mordred
+        `Percival
+            `sees Merlin and Morgana
+        `Servants
+            `sees themself
+        `Minions
+            `sees themself except Oberon
+        `Oberon
+            `can't see shit
 
 misc:
-    modify fPrint snippet
-    home link for admin shouldn't go to player page
-    check for duplicate name for the game
+    `check for duplicate player name for the game
+    `home link for admin shouldn't go to player page
+    `Player shouldn't be able to start game until Admin starts it
+    `Morgana can only be used when Percival is in the game
     `use session to keep player id when going from wait page to role page
         don't display name in role page
     `move assign roles to another class

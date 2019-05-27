@@ -12,8 +12,10 @@ use yii\web\Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
 use yii\web\HttpException;
+use yii\web\NotFoundHttpException;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\helpers\RoleHelper;
 
 class AdminController extends Controller
 {
@@ -25,11 +27,11 @@ class AdminController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout'],
+                'only' => ['index', 'wait', 'role', 'delete'],
                 'rules' => [
                     [
-                        'actions' => ['logout'],
                         'allow' => true,
+                        'actions' => ['index', 'wait', 'role', 'delete'],
                         'roles' => ['@'],
                     ],
                 ],
@@ -105,8 +107,11 @@ class AdminController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+        $players = Player::find()->where(['fk_game_id'=>$id])->all();
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'players' => $players,
         ]);
     }
 
@@ -120,7 +125,6 @@ class AdminController extends Controller
     {
         $model = $this->findModel($id);
         if (Yii::$app->request->post()) {
-
             // start game
             if ($model->startGame()) {
                 // redirect to role page
@@ -129,8 +133,30 @@ class AdminController extends Controller
 
         }
 
-        return $this->render('wait', [
+        return $this->render('@app/views/common/wait.php', [
             'model' => $model,
+        ]);
+    }
+
+    /**
+     * Role page
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionRole($id, $playerId)
+    {
+        $gameModel = $this->findModel($id);
+        $playerModel = $this->findPlayerModel($playerId);
+        extract(RoleHelper::findRoles($gameModel));
+
+        return $this->render('@app/views/common/role.php', [
+            'gameModel' => $gameModel,
+            'playerModel' => $playerModel,
+            'minions' => $minions,
+            'servants' => $servants,
+            'merlin' => $merlin,
+            'morgana' => $morgana,
         ]);
     }
 
@@ -144,7 +170,7 @@ class AdminController extends Controller
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
-
+        Player::deleteFromGame($id);
         return $this->redirect(['index']);
     }
 
@@ -158,6 +184,22 @@ class AdminController extends Controller
     protected function findModel($id)
     {
         if (($model = Game::findOne($id)) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    /**
+     * Finds the Plaer model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return Player the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findPlayerModel($id)
+    {
+        if (($model = Player::findOne($id)) !== null) {
             return $model;
         }
 

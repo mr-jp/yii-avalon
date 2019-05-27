@@ -2,7 +2,7 @@
 
 namespace app\helpers;
 
-class ArrayHelper
+class MyHelper
 {
     public static function fPrint($value)
     {
