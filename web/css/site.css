@@ -113,3 +113,8 @@ a.desc:after {
 .nav > li > form > button.logout:focus {
     outline: none;
 }
+
+.role-img {
+    margin-left:    35px;
+    max-width:      200px;
+}
