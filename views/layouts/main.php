@@ -40,7 +40,7 @@ AppAsset::register($this);
         'items' => [
 
             Yii::$app->user->isGuest ? (
-                ['label' => 'Player', 'url' => ['/site/index']]
+                ['label' => 'New Game', 'url' => ['/site/index']]
             ) : (
                 ['label' => 'Admin', 'url' => ['/admin/index']]
             ),

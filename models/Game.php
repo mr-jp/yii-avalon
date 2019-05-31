@@ -169,7 +169,7 @@ class Game extends \yii\db\ActiveRecord
             $player->team = $role['team'];
             $player->role = $role['role'];
             if ($player->save() == false) {
-                throw new NotFoundHttpException('Cannot save player role ...');
+                throw new NotFoundHttpException('Cannot save player roles ...');
             }
         }
     }

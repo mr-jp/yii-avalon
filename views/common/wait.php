@@ -11,7 +11,8 @@ $this->title = 'Wait Page';
 ?>
 <div class="wait-view">
 
-    <h2>Waiting for other players ...</h2>
+    <h2><?= date("Ydm - H:i", $gameModel->timestamp) ?></h2>
+    <h3>Waiting for other players ...</h3>
 
     <?php $form = ActiveForm::begin(); ?>
     <?= $form->errorSummary($model); ?>

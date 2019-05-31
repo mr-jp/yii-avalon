@@ -125,6 +125,7 @@ class SiteController extends Controller
 
         return $this->render('@app/views/common/wait.php', [
             'model' => $model,
+            'gameModel' => $gameModel
         ]);
     }
 

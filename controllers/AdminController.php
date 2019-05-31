@@ -90,6 +90,9 @@ class AdminController extends Controller
                 throw new HttpException(403, $message);
             }
 
+            // Set older open games to closed
+            Game::updateAll(['started'=>'1'], "id != {$model->id}");
+
             return $this->redirect(['wait', 'id' => $model->id, 'playerId' => $model2->id]);
         }
 
@@ -135,6 +138,7 @@ class AdminController extends Controller
 
         return $this->render('@app/views/common/wait.php', [
             'model' => $model,
+            'gameModel' => $model
         ]);
     }
 

@@ -22,6 +22,11 @@ $textOberon = '<span class="text-danger">Oberon (Evil)</span>';
 <div class="role-view">
     <div class="row">
         <div class="col-lg-6">
+            <a href="<?= Yii::$app->urlManager->createUrl(['site/index']) ?>">&lt;&lt; New Game</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
             <h1 class="<?= $playerModel->team == 'servants' ? 'text-success' : 'text-danger' ?>">
                 <?= ucfirst($playerModel->name) ?> /
                 <?= ucfirst($playerModel->team) ?> /
